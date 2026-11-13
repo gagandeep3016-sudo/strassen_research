@@ -14,7 +14,7 @@
 \newtheorem{proposition}{Proposition}
 \newcommand{\flop}{\operatorname{op}}
 \title{\vspace{-1.1cm}\bfseries Beyond $n^3$: Strassen's Multiplication, Block LU Decomposition, and the Cost of Solving $Ax=b$}
-\author{Student Name\\Roll No. XXXXXXX\\Rishihood University --- PRISM 2026}
+\author{Gagandeep \& Suryansh Tiwari\\Rishihood University --- PRISM 2026}
 \date{}
 \begin{document}
 \maketitle
@@ -133,9 +133,12 @@ Despite the arithmetic reduction, Strassen over NumPy/OpenBLAS is slower at ever
 The exact block-LU operation count falls below the classical count as $n$ grows. Runtime tells a different story. For the complete factor-and-solve pipeline, the Strassen-$m=64$ to classical block-LU median-time ratios are 1.03 at $n=256$, 0.97 at $n=512$ and 1.12 at $n=1024$. The small differences at $n=256$ and $512$ do not establish a reliable speed advantage; at $n=1024$ Strassen is 12\% slower in this run. The pivoted LAPACK reference is faster than either recursive Python-level implementation at all tested sizes. These results do not establish a universal ranking: they show that arithmetic savings alone do not determine practical performance.
 
 \newpage
-\subsection{Numerical accuracy}
-At $n=256$, the diagonally dominant family has residuals around $10^{-16}$ for all unpivoted methods. For the SPD family with condition number $10^6$, the cutoff-8 Strassen block LU has median factorization error $1.0\times10^{-15}$ and residual $1.2\times10^{-16}$, compared with $2.5\times10^{-16}$ and $7.6\times10^{-17}$ for classical block LU. Forward error is around $10^{-11}$, illustrating the effect of conditioning. On Gaussian matrices, the no-pivot Strassen cutoff-8 method has median residual $1.7\times10^{-12}$, versus $1.1\times10^{-13}$ for classical block LU and $1.0\times10^{-15}$ for pivoted LAPACK. This stress test mixes the effects of Strassen arithmetic and omitted pivoting; it does not isolate Strassen's stability by itself. The broader stability literature distinguishes the behavior of fast multiplication from the stability of a complete factorization [4,5].
+\subsection{Numerical accuracy and timing robustness}
+At $n=256$, the diagonally dominant family exhibits scaled residuals around $10^{-16}$ across all unpivoted methods. For the symmetric positive-definite (SPD) family with condition number $\kappa_2(A) \approx 10^{6}$, the matched block-32 Strassen block LU yields a median factorization error of $1.0 \times 10^{-15}$ and a residual of $7.2 \times 10^{-17}$, closely matching classical block LU ($2.5 \times 10^{-16}$ factorization error and $7.6 \times 10^{-17}$ residual). Forward errors remain near $10^{-11}$, reflecting conditioning limits. 
 
+On unshifted Gaussian test matrices ($n=256$), the matched block-32 Strassen variant reports a median residual of $3.5 \times 10^{-13}$, compared with $1.1 \times 10^{-13}$ for classical block LU and $1.0 \times 10^{-15}$ for pivoted LAPACK. This represents an honest accuracy gap of approximately $3\times$ rather than the larger discrepancy observed under aggressive recursion boundaries (cutoff $m=8$). This stress test conflates Strassen arithmetic accumulation with the absence of pivoting; it does not isolate fast multiplication stability alone [4, 5]. 
+
+Finally, analyzing run-to-run performance stability across samples indicates an interquartile spread of $1\text{--}12\%$ for multiplication and $3\text{--}13\%$ for complete solves; runtime ratios falling within these empirical noise bands should be interpreted as statistical ties rather than definitive speed advantages.
 \begin{figure}[h]\centering\includegraphics[width=0.98\linewidth]{figures/fig1_multiplication.pdf}
 \caption{(a) Exact arithmetic-count ratios. (b) Median multiplication-time ratio for the best tested Strassen cutoff relative to single-thread NumPy/OpenBLAS. Values above one indicate Strassen is slower.}\end{figure}
 
