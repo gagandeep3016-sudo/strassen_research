@@ -1,0 +1,8 @@
+Execution environment used for the included results:
+OS: Linux x86-64 (containerized/shared host)
+CPU host model: AMD EPYC 9V74 80-Core Processor
+BLAS: OpenBLAS 0.3.30, restricted to 1 thread
+Python: 3.13.5
+NumPy: 2.3.5
+SciPy: 1.17.0
+Benchmark timing: time.perf_counter, warm-up, median of repeated runs
